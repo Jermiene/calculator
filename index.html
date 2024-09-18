@@ -107,7 +107,7 @@
         <h1>Grade Calculator</h1>
         <div class="input-container">
             <input id="prelim_grade" type="text" placeholder="Enter Prelim Grade (0-100)">
-            <button onclick="calculateGrade()">Calculate</button>
+            <button id="calculate-button">Calculate</button>
         </div>
         <div id="output"></div>
     </div>
@@ -154,5 +154,11 @@
             output = Element("output")
             output.write(result)
     </py-script>
+    <script>
+        function on_button_click() {
+            alert('Button clicked!');
+        }
+        document.getElementById('calculate-button').addEventListener('click', on_button_click);
+    </script>
 </body>
 </html>
