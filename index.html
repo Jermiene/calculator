@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grade Calculator</title>
-    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css">
     <script defer src="https://pyscript.net/latest/pyscript.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-        
         body {
             font-family: 'Roboto', sans-serif;
             background: linear-gradient(135deg, #74ebd5, #ACB6E5);
@@ -35,12 +33,6 @@
             font-weight: 700;
             font-size: 32px;
             color: #333;
-        }
-        .input-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
         }
         input {
             width: 100%;
@@ -80,6 +72,7 @@
             border-radius: 8px;
             font-size: 1.2em;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: none;
         }
         .result {
             background-color: #e6f7ff;
@@ -89,7 +82,6 @@
         .error {
             background-color: #ffe6e6;
             color: #dc3545;
-            text-align: left;
         }
         .ascii-art {
             white-space: pre-wrap;
@@ -106,14 +98,19 @@
     <div class="container">
         <h1>Grade Calculator</h1>
         <div class="input-container">
-            <input id="prelim_grade" type="text" placeholder="Enter Prelim Grade (0-100)">
-            <button id="calculate-button">Calculate</button>
+            <form id="grade-form">
+                <input type="text" id="prelim-grade" placeholder="Enter Prelim Grade (0-100)" required>
+                <button type="button" id="calculate-button">Calculate</button>
+            </form>
         </div>
-        <div id="output"></div>
+
+        <div id="result" class="result"></div>
+        <div id="error" class="error"></div>
     </div>
+
     <div class="ascii-art">
         <pre>
-   ▄▄▄▄▄ ▄███▄   █▄▄▄▄ █▀▄▀█ ▄█ ▄███▄      ▄   ▄███▄       ▄███▄   █      ▄▀  ▄█    ▄       █▀▄▀█ ██     ▄▄▄▄▀ ▄▄▄▄▀ ▄  █ ▄███▄     ▄ ▄   
+ ▄▄▄▄▄ ▄███▄   █▄▄▄▄ █▀▄▀█ ▄█ ▄███▄      ▄   ▄███▄       ▄███▄   █      ▄▀  ▄█    ▄       █▀▄▀█ ██     ▄▄▄▄▀ ▄▄▄▄▀ ▄  █ ▄███▄     ▄ ▄   
 ▄▀  █   █▀   ▀  █  ▄▀ █ █ █ ██ █▀   ▀      █  █▀   ▀      █▀   ▀  █    ▄▀    ██     █      █ █ █ █ █ ▀▀▀ █ ▀▀▀ █   █   █ █▀   ▀   █   █  
     █   ██▄▄    █▀▀▌  █ ▄ █ ██ ██▄▄    ██   █ ██▄▄        ██▄▄    █    █ ▀▄  ██ ██   █     █ ▄ █ █▄▄█    █     █   ██▀▀█ ██▄▄    █ ▄   █ 
  ▄ █    █▄   ▄▀ █  █  █   █ ▐█ █▄   ▄▀ █ █  █ █▄   ▄▀     █▄   ▄▀ ███▄ █   █ ▐█ █ █  █     █   █ █  █   █     █    █   █ █▄   ▄▀ █  █  █ 
@@ -123,6 +120,8 @@
     </div>
 
     <py-script>
+        from js import document
+
         def calculate_grade(prelim_grade):
             prelim_weight = 0.20
             midterm_weight = 0.30
@@ -130,35 +129,61 @@
             target_grade = 75
             deans_list_grade = 90
 
-            prelim_grade = float(prelim_grade)
             required_from_midterm_finals = target_grade - (prelim_grade * prelim_weight)
             combined_grade = required_from_midterm_finals / (midterm_weight + finals_weight)
 
             if combined_grade < 0 or combined_grade > 100:
-                return "Sorry, it's impossible to reach the target grade with the given prelim grade."
-            
+                return None, "Sorry, it's impossible to reach the target grade with the given prelim grade."
+
             deans_required = deans_list_grade - (prelim_grade * prelim_weight)
             deans_combined_grade = deans_required / (midterm_weight + finals_weight)
 
             if deans_combined_grade > 100:
                 deans_message = "Unfortunately, it's not possible to achieve a 90 overall grade based on your Prelim grade."
             else:
-                deans_message = f"To achieve a 90 overall grade (Dean's Lister), you need to get at least {deans_combined_grade:.2f} in both Midterm and Final."
+                deans_message = f"To achieve a 90 overall grade (Dean's Lister), you need to at least get the grade of {deans_combined_grade:.2f} in both Midterm and Final."
 
-            result_message = f"With a Prelim grade of {prelim_grade:.2f}, to get an overall grade of at least 75, you need to get at least {combined_grade:.2f} in both Midterm and Final.<br>{deans_message}"
-            return result_message
+            result_html = f"""
+                <p>With a Prelim grade of <strong>{prelim_grade:.2f}</strong>, to get an overall grade of at least 75, you need to at least get the grade of <strong>{combined_grade:.2f}</strong> in both Midterm and Final.</p>
+                <p>{deans_message}</p>
+            """
 
-        def calculateGrade():
-            prelim_grade = Element("prelim_grade").value
-            result = calculate_grade(prelim_grade)
-            output = Element("output")
-            output.write(result)
+            return result_html, None
+
+        def on_button_click(event):
+            prelim_input = document.getElementById('prelim-grade')
+            prelim_grade = float(prelim_input.value)
+
+            if prelim_grade < 0 or prelim_grade > 100:
+                document.getElementById('error').style.display = 'block'
+                document.getElementById('error').innerText = 'Please enter a grade between 0 and 100.'
+                document.getElementById('result').style.display = 'none'
+            else:
+                result_html, error_message = calculate_grade(prelim_grade)
+
+                if error_message:
+                    document.getElementById('error').style.display = 'block'
+                    document.getElementById('error').innerText = error_message
+                    document.getElementById('result').style.display = 'none'
+                else:
+                    document.getElementById('result').innerHTML = result_html
+                    document.getElementById('result').style.display = 'block'
+                    document.getElementById('error').style.display = 'none'
+
+        document.getElementById('calculate-button').onclick = on_button_click
+
+        def on_input_change(event):
+            input_value = event.target.value
+            # Remove any characters that are not digits
+            sanitized_value = ''.join(char for char in input_value if char.isdigit())
+            event.target.value = sanitized_value
+
+        document.getElementById('prelim-grade').addEventListener('input', on_input_change)
     </py-script>
     <script>
-        function on_button_click() {
-            alert('Button clicked!');
-        }
-        document.getElementById('calculate-button').addEventListener('click', on_button_click);
+        document.getElementById('prelim-grade').addEventListener('input', function(event) {
+            event.target.value = event.target.value.replace(/[^0-9]/g, '');
+        });
     </script>
 </body>
 </html>
