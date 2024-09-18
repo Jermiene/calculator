@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade Calculator</title>
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 32px;
+            color: #333;
+        }
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            max-width: 400px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.2em;
+            transition: border-color 0.3s ease;
+            text-align: center;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+        input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            max-width: 400px;
+            padding: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: background-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result, .error {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 1.2em;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .result {
+            background-color: #e6f7ff;
+            color: #007bff;
+            text-align: left;
+        }
+        .error {
+            background-color: #ffe6e6;
+            color: #dc3545;
+            text-align: left;
+        }
+        .ascii-art {
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            color: #333;
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Grade Calculator</h1>
+        <div class="input-container">
+            <input id="prelim_grade" type="text" placeholder="Enter Prelim Grade (0-100)">
+            <button onclick="calculateGrade()">Calculate</button>
+        </div>
+        <div id="output"></div>
+    </div>
+    <div class="ascii-art">
+        <pre>
+   ▄▄▄▄▄ ▄███▄   █▄▄▄▄ █▀▄▀█ ▄█ ▄███▄      ▄   ▄███▄       ▄███▄   █      ▄▀  ▄█    ▄       █▀▄▀█ ██     ▄▄▄▄▀ ▄▄▄▄▀ ▄  █ ▄███▄     ▄ ▄   
+▄▀  █   █▀   ▀  █  ▄▀ █ █ █ ██ █▀   ▀      █  █▀   ▀      █▀   ▀  █    ▄▀    ██     █      █ █ █ █ █ ▀▀▀ █ ▀▀▀ █   █   █ █▀   ▀   █   █  
+    █   ██▄▄    █▀▀▌  █ ▄ █ ██ ██▄▄    ██   █ ██▄▄        ██▄▄    █    █ ▀▄  ██ ██   █     █ ▄ █ █▄▄█    █     █   ██▀▀█ ██▄▄    █ ▄   █ 
+ ▄ █    █▄   ▄▀ █  █  █   █ ▐█ █▄   ▄▀ █ █  █ █▄   ▄▀     █▄   ▄▀ ███▄ █   █ ▐█ █ █  █     █   █ █  █   █     █    █   █ █▄   ▄▀ █  █  █ 
+  ▀     ▀███▀     █      █   ▐ ▀███▀   █  █ █ ▀███▀       ▀███▀       ▀ ███   ▐ █  █ █        █     █  ▀     ▀        █  ▀███▀    █ █ █  
+                 ▀      ▀              █   ██                                   █   ██       ▀     █                 ▀             ▀ ▀   
+        </pre>
+    </div>
+
+    <py-script>
+        def calculate_grade(prelim_grade):
+            prelim_weight = 0.20
+            midterm_weight = 0.30
+            finals_weight = 0.50
+            target_grade = 75
+            deans_list_grade = 90
+
+            prelim_grade = float(prelim_grade)
+            required_from_midterm_finals = target_grade - (prelim_grade * prelim_weight)
+            combined_grade = required_from_midterm_finals / (midterm_weight + finals_weight)
+
+            if combined_grade < 0 or combined_grade > 100:
+                return "Sorry, it's impossible to reach the target grade with the given prelim grade."
+            
+            deans_required = deans_list_grade - (prelim_grade * prelim_weight)
+            deans_combined_grade = deans_required / (midterm_weight + finals_weight)
+
+            if deans_combined_grade > 100:
+                deans_message = "Unfortunately, it's not possible to achieve a 90 overall grade based on your Prelim grade."
+            else:
+                deans_message = f"To achieve a 90 overall grade (Dean's Lister), you need to get at least {deans_combined_grade:.2f} in both Midterm and Final."
+
+            result_message = f"With a Prelim grade of {prelim_grade:.2f}, to get an overall grade of at least 75, you need to get at least {combined_grade:.2f} in both Midterm and Final.<br>{deans_message}"
+            return result_message
+
+        def calculateGrade():
+            prelim_grade = Element("prelim_grade").value
+            result = calculate_grade(prelim_grade)
+            output = Element("output")
+            output.write(result)
+    </py-script>
+</body>
+</html>
