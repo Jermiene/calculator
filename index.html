@@ -150,12 +150,16 @@
             result_message = f"With a Prelim grade of {prelim_grade:.2f}, to get an overall grade of at least 75, you need to get at least {combined_grade:.2f} in both Midterm and Final.<br>{deans_message}"
             return result_message
 
-        def on_button_click(event):
+        def calculateGrade():
             prelim_grade = Element("prelim_grade").value
             result = calculate_grade(prelim_grade)
             Element("output").write(result)
-                
-        Element("calculate-button").element.addEventListener("click", on_button_click)
+
+        # Bind the event after the PyScript has loaded
+        def on_load():
+            Element("calculate-button").element.addEventListener("click", lambda event: calculateGrade())
+
+        on_load()
     </py-script>
 </body>
 </html>
