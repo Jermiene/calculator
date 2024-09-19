@@ -123,7 +123,7 @@
     </div>
 
     <py-script>
-        from pyscript import Element
+        from pyscript import Element, create_proxy
 
         def calculate_grade(prelim_grade):
             prelim_weight = 0.20
@@ -155,9 +155,9 @@
             result = calculate_grade(prelim_grade)
             Element("output").write(result)
 
-        # Bind the event after the PyScript has loaded
         def on_load():
-            Element("calculate-button").element.addEventListener("click", lambda event: calculateGrade())
+            button = Element("calculate-button").element
+            button.addEventListener("click", create_proxy(calculateGrade))
 
         on_load()
     </py-script>
