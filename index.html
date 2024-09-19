@@ -123,7 +123,7 @@
     </div>
 
     <py-script>
-        from pyscript import Element, display
+        from pyscript import Element
 
         def calculate_grade(prelim_grade):
             prelim_weight = 0.20
@@ -154,13 +154,8 @@
             prelim_grade = Element("prelim_grade").value
             result = calculate_grade(prelim_grade)
             Element("output").write(result)
-
-        # Attach event listener to the button
-        def main():
-            button = Element("calculate-button")
-            button.element.addEventListener("click", on_button_click)
-        
-        main()
+                
+        Element("calculate-button").element.addEventListener("click", on_button_click)
     </py-script>
 </body>
 </html>
