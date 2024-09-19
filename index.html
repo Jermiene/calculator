@@ -170,6 +170,8 @@
                     document.getElementById('result').style.display = 'block'
                     document.getElementById('error').style.display = 'none'
 
+        document.getElementById('calculate-button').onclick = on_button_click
+
         def on_input_change(event):
             input_value = event.target.value
             # Remove any characters that are not digits
@@ -177,7 +179,12 @@
             event.target.value = sanitized_value
 
         document.getElementById('prelim-grade').addEventListener('input', on_input_change)
-        document.getElementById('calculate-button').onclick = on_button_click
     </py-script>
+        <!-- So only numbers can be inputted -->
+    <script>
+        document.getElementById('prelim-grade').addEventListener('input', function(event) {
+            event.target.value = event.target.value.replace(/[^0-9]/g, '');
+        });
+    </script>
 </body>
 </html>
